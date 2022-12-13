@@ -14,8 +14,9 @@ import re
 from dataclasses import dataclass
 
 @dataclass
-class regex_in:
+class RegexIn: # Create a regex class for using with match statement
     """Class that takes string and matching it with a pattern"""
+    
     string: str
 
     def __eq__(self, pattern: str | re.Pattern):
@@ -47,7 +48,7 @@ def formate_numbers(func):
             # Convert to string for regex and further concatenation
             number_str = str(number)
             
-            match regex_in(number_str):
+            match RegexIn(number_str):
                 case r"^(?P<section1>\d{5})(?P<section2>\d{5})$": # count: 10 numbers
 
                     matching = re.match(r"^(?P<section1>\d{5})(?P<section2>\d{5})$", number_str)
@@ -71,6 +72,7 @@ def formate_numbers(func):
         # Return sorting numbers
         sorting_numbers = func(new_numbers)
         return sorting_numbers
+    
     return wrapper
 
 @formate_numbers
