@@ -35,14 +35,14 @@ class regex_in:
         return pattern.fullmatch(self.string) is not None
 
 
-def wrapper(f):
-    def fun(l):
+def formate_numbers(func):
+    def wrapper(numbers):
         # Handle numbers and change its format
         # 07895462130 -> 0 78954 62130 -> +91 78954 62130
         new_numbers = []
         checking_pattern = "[+]?(\d{0,2})\s(\d){5}\s(\d){5}"
           
-        for number in l:
+        for number in numbers:
 
             # Convert to string for regex and further concatenation
             number_str = str(number)
@@ -69,11 +69,11 @@ def wrapper(f):
             new_numbers.append(number_str) 
                     
         # Return sorting numbers
-        sorting_numbers = f(new_numbers)
+        sorting_numbers = func(new_numbers)
         return sorting_numbers
-    return fun
+    return wrapper
 
-@wrapper
+@formate_numbers
 def sort_phone(l):
     print(*sorted(l), sep='\n')
 
