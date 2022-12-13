@@ -1,3 +1,14 @@
+"""
+Main goal:
+    - Decorate the sort_phone() method that take list of numbers and sorting them
+    - The numbers should be in certain shape
+        -> Additional code for edit number's format
+            -> Hence, decorating the sort_phone() method to add ability to edit numbers before 
+                method execution.
+"""
+
+
+
 
 import re
 from dataclasses import dataclass
@@ -68,5 +79,4 @@ def sort_phone(l):
 
 if __name__ == '__main__':
     l = [input() for _ in range(int(input()))]
-    # l = [9195969878]
     sort_phone(l) 
