@@ -7,7 +7,7 @@ rectangle
 
 # Import libraries
 from dataclasses import dataclass, field
-
+import traceback
 
 @dataclass
 class Point:
@@ -21,9 +21,15 @@ class Line:
     """
     point1: Point
     point2: Point
+    name: str = field(default=None)
+
+    def __post_init__(self):
+        if self.name == None:
+            filename, line_number, function_name, text = traceback.extract_stack()[-3]
+            self.name = text[:text.find('=')].strip()
 
     def __str__(self) -> str:
-        return f"Line(p1={self.point1}, p2={self.point2})"
+        return self.name
 
     @property
     def slop(self):
@@ -79,16 +85,16 @@ class Rectangle:
         """
         width = self.width
         hight = self.hight
-        line1 = Line(self.lowest_point, Point(
+        left_line = Line(self.lowest_point, Point(
             self.lowest_point.x, self.lowest_point.y + hight))
-        line2 = Line(self.lowest_point, Point(
+        bottom_line = Line(self.lowest_point, Point(
             self.lowest_point.x + width, self.lowest_point.y))
-        line3 = Line(self.highest_point, Point(
+        right_line = Line(self.highest_point, Point(
             self.highest_point.x, self.highest_point.y - hight))
-        line4 = Line(self.highest_point, Point(
+        top_line = Line(self.highest_point, Point(
             self.highest_point.x - width, self.highest_point.y))
 
-        return (line1, line2, line3, line4)
+        return (left_line, bottom_line, right_line, top_line)
 
 
 def intersection(line1: Line, line2: Line):
@@ -145,9 +151,12 @@ if __name__ == "__main__":
 
     rec = Rectangle(bottom_left_point, upper_right_point)
 
-    for line in lines:
-        print(line.coef)
+    for ind, line in enumerate(lines):
+        # print(line.coef)
+        print(f"Line {ind} -> intersect with:")
         for rec_line in rec.lines:
-            print(f"{rec_line} intersect at {intersection(line, rec_line)}")
+            print(f"{'':<5}{rec_line} at {intersection(line, rec_line)}")
 
         print("-"*50)
+
+
