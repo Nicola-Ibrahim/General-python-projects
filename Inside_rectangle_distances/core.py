@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 import traceback
 from typing import Self
 
+
 @dataclass
 class Point:
     x: float
@@ -31,13 +32,15 @@ class Line:
 
     def __post_init__(self):
         if self.name is None:
-            filename, line_number, function_name, text = traceback.extract_stack()[-3]
+            filename, line_number, function_name, text = traceback.extract_stack(
+            )[-3]
             self.name = text[:text.find('=')].strip()
 
     def __str__(self) -> str:
-        return self.name
-
-    
+        output = f"Line{(self.point1, self.point2)}"
+        if (self.name is None):
+            output = self.name + output
+        return output
 
     @property
     def slop(self):
@@ -79,13 +82,21 @@ class Rectangle:
     highest_point: Point
     width: float = field(init=False)
     hight: float = field(init=False)
-   
 
     def __post_init__(self):
         self.width = self.highest_point.x - self.lowest_point.x
         self.hight = self.highest_point.y - self.lowest_point.y
 
-    def is_inner_boundary(self, point: Point):
+        self._rec_left_line = Line(self.lowest_point, Point(
+            self.lowest_point.x, self.lowest_point.y + self.hight))
+        self._rec_bottom_line = Line(self.lowest_point, Point(
+            self.lowest_point.x + self.width, self.lowest_point.y))
+        self._rec_right_line = Line(self.highest_point, Point(
+            self.highest_point.x, self.highest_point.y - self.hight))
+        self._rec_top_line = Line(self.highest_point, Point(
+            self.highest_point.x - self.width, self.highest_point.y))
+
+    def is_inner(self, point: Point):
         """Check if the point is inner or in the boundary of the rectangle
 
         Args:
@@ -94,13 +105,13 @@ class Rectangle:
         Returns:
             bool: condition belongs to the checked point
         """
-        # TODO: Change condition if applicable after debugging 
+        # TODO: Change condition if applicable after debugging
         # return  self.lowest_point <= point <= self.highest_point
 
         COND1 = self.lowest_point.x <= point.x <= self.highest_point.x
         COND2 = self.lowest_point.y <= point.y <= self.highest_point.y
         return COND1 == True and COND2 == True
-    
+
     def is_outer(self, point: Point):
         """Check if the point is outer of the rectangle
 
@@ -110,15 +121,14 @@ class Rectangle:
         Returns:
             bool: condition belongs to the checked point
         """
-        
-        # TODO: Change condition if applicable after debugging 
+
+        # TODO: Change condition if applicable after debugging
         # return point < self.lowest_point or point > self.highest_point
 
         COND1 = point.x < self.lowest_point.x or point.x > self.highest_point.x
         COND2 = point.y < self.lowest_point.y or point.y > self.highest_point.y
         return COND1 == True and COND2 == True
-        
-    
+
     @property
     def lines(self):
         """Returns the rectangle lines
@@ -126,19 +136,5 @@ class Rectangle:
         Returns:
             tuple: rectangle's lines
         """
-        width = self.width
-        hight = self.hight
-        rec_left_line = Line(self.lowest_point, Point(
-            self.lowest_point.x, self.lowest_point.y + hight))
-        rec_bottom_line = Line(self.lowest_point, Point(
-            self.lowest_point.x + width, self.lowest_point.y))
-        rec_right_line = Line(self.highest_point, Point(
-            self.highest_point.x, self.highest_point.y - hight))
-        rec_top_line = Line(self.highest_point, Point(
-            self.highest_point.x - width, self.highest_point.y))
 
-        return (rec_left_line, rec_bottom_line, rec_right_line, rec_top_line)
-
-
-
-
+        return (self._rec_left_line, self._rec_bottom_line, self._rec_right_line, self._rec_top_line)
