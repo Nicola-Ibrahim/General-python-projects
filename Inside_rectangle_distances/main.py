@@ -5,26 +5,15 @@ rectangle
 """
 
 from core import Point, Line, Rectangle
-from utils import make_rectangle, intersection
+from utils import make_rectangle, location
 
 
 def process(lines: tuple[Line], rectangle: Rectangle):
 
-    new_lines = []
     for ind, line in enumerate(lines, 1):
-        # print(line.coef)
-        # print(f"Line {ind} -> intersect with:")
-        # for rec_line in rectangle.lines:
-        #     print(f"{'':<5}{rec_line} at {intersection(line, rec_line)}")
 
         # print("-"*50)
-
-        # Check line's points location
-        # rectangle.lowest_point.x <= line.point1.x <= rectangle.lowest_point.x + rectangle.width
-
-        # If both points are inside then no need to find the intersection
-        if(line.point1 <= rectangle.lowest_point):
-            print("yes")
+        print(f"{location(line, rectangle)}")
 
 if __name__ == "__main__":
 
@@ -38,6 +27,7 @@ if __name__ == "__main__":
 
     lines_points = (
         ((-3, 4), (0, 8)),
+        ((6, 2), (12, 9)),
         ((-4, 2), (2, 4)),
         ((-1, 4), (6, 0)),
         ((3, 7), (10, -1)),
