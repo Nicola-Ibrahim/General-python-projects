@@ -1,5 +1,5 @@
 from core import Point, Line, Rectangle
-
+import math
 
 
 def make_rectangle(points: list[Point]):
@@ -41,13 +41,31 @@ def intersection(line1: Line, line2: Line):
     else:
         return None
 
-def intersected_line(line: Line, rectangle: Rectangle, inner_point = Point|None) -> Line:
+
+def calculate_distance(point1: Point, point2: Point) -> float:
+    """Calculate the Euclidean distance between two points
+
+    Args:
+        point1 (Point): first point
+        point2 (Point): second point
+
+    Returns:
+        float: distance value
+    """
+    dist = math.dist((point1.x, point1.y), (point2.x, point2.y))
+    return dist
+
+
+# TODO: create wrapper method for decoration
+def intersected_line(line: Line, rectangle: Rectangle, 
+    checking_point: Point = None, inner_point: Point = None) -> Line:
+
     """Intersect the line with rectangle's lines
 
     Args:
         line (Line): the desired line to find its intersection points
         rectangle (Rectangle): rectangle
-        inner_point (Point, optional): one of the inner line's points. Defaults to Point | None.
+        checking_point (Point, optional): outer line's point. Defaults to Point | None.
 
     Returns:
         Line: the section of line that lie inside of the rectangle
@@ -61,47 +79,55 @@ def intersected_line(line: Line, rectangle: Rectangle, inner_point = Point|None)
 
         inter_point = Point(x, y)
 
-        if(rectangle.is_inner(inter_point)):
+        if (rectangle.is_inner(inter_point)):
             inter_points.append(inter_point)
 
-    if(not inter_points):
+    if (not inter_points):
         return None
 
-    if(isinstance(inner_point, Point)):
-        # Find the distance between inner point and the
+    if (isinstance(checking_point, Point)):
+        # Find the distance between outer point and the
         # both intersected points
-        # and select the bigger distance
+        # and select the lower distance
 
-        # TODO: change the way of checking the actual line
+        dist1 = calculate_distance(checking_point, inter_points[0])
+        dist2 = calculate_distance(checking_point, inter_points[1])
 
         line = Line(*inter_points)
-        if(line.slop > 0):
-            return Line(inter_points[0], inner_point)
-        
-        elif(line.slop < 0):
-            return Line(inter_points[1], inner_point)
-    
+        if (dist1 > dist2):
+            inter_points = (inner_point, inter_points[1])
+
+        elif (dist1 < dist2):
+            inter_points = (inner_point, inter_points[0])
+
     return Line(*inter_points)
 
 
+def location(line: Line, rectangle: Rectangle) -> Line:
+    """Check the line location
 
-def location(line: Line, rectangle: Rectangle):
+    Args:
+        line (Line): line to be checked
+        rectangle (Rectangle): rectangle that line intersects with
 
-    point1_COND = rectangle.is_inner(line.point1)
-    point2_COND = rectangle.is_inner(line.point2)
-    
+    Returns:
+        Line: a new line the locate inside the rectangle
+    """
+
+    IS_POINT1_INNER = rectangle.is_inner(line.point1)
+    IS_POINT2_INNER = rectangle.is_inner(line.point2)
+
     # Both line's points are inside the rectangle
-    if(point1_COND and point2_COND):
+    if (IS_POINT1_INNER and IS_POINT2_INNER):
         return line
 
     # One of the points is outside
-    elif(point1_COND and not point2_COND):
-        return intersected_line(line, rectangle, inner_point=line.point1)
+    elif (IS_POINT1_INNER and not IS_POINT2_INNER):
 
-    elif(not point1_COND and point2_COND):
-        return intersected_line(line, rectangle, inner_point=line.point2)
+        # pass outer line outer point for calculate the distance
+        return intersected_line(line, rectangle, checking_point=line.point2, inner_point=line.point1)
 
-    # Both are outside
-    return intersected_line(line, rectangle)
-
+    elif (not IS_POINT1_INNER and IS_POINT2_INNER):
+        # pass outer line outer point for calculate the distance
+        return intersected_line(line, rectangle, checking_point=line.point1, inner_point=line.point2)
 
