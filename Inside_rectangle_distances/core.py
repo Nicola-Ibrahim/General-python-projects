@@ -2,7 +2,7 @@
 from dataclasses import dataclass, field
 import traceback
 from typing import Self
-
+import math
 
 @dataclass
 class Point:
@@ -71,6 +71,17 @@ class Line:
         coef_values['C'] = -C
         return coef_values
 
+
+    @property
+    def distance(self) -> float:
+        
+        """Calculate the Euclidean distance between two points
+
+        Returns:
+            float: distance value
+        """
+        dist = math.dist((self.point1.x, self.point1.y), (self.point2.x, self.point2.y))
+        return dist
 
 @dataclass
 class Rectangle:
