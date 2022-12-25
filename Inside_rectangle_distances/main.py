@@ -8,12 +8,13 @@ from core import Point, Line, Rectangle
 from utils import make_rectangle, location
 
 
-def process(lines: tuple[Line], rectangle: Rectangle):
+def calculate_inner_distance(lines: tuple[Line], rectangle: Rectangle):
 
-    for ind, line in enumerate(lines, 1):
+    inner_lines = [location(line, rectangle) for line in lines]
 
-        # print("-"*50)
-        print(f"{location(line, rectangle)}")
+    inner_lines = [line.distance for line in lines if line is not None]
+    
+    return sum(inner_lines)
 
 if __name__ == "__main__":
 
@@ -27,7 +28,7 @@ if __name__ == "__main__":
 
     lines_points = (
         ((-3, 4), (0, 8)),
-        ((6, 2), (12, 9)),
+        # ((6, 2), (12, 9)),
         ((-4, 2), (2, 4)),
         ((-1, 4), (6, 0)),
         ((3, 7), (10, -1)),
@@ -45,7 +46,7 @@ if __name__ == "__main__":
 
     rectangle = make_rectangle(rectangle_points)
 
-    process(lines, rectangle)
+    print(calculate_inner_distance(lines, rectangle))
 
     
 
