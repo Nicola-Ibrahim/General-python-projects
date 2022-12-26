@@ -131,3 +131,28 @@ def location(line: Line, rectangle: Rectangle) -> Line:
         # pass outer line outer point for calculate the distance
         return intersected_line(line, rectangle, checking_point=line.point1, inner_point=line.point2)
 
+
+    elif(not IS_POINT1_INNER and not IS_POINT2_INNER):
+        return intersected_line(line, rectangle)
+
+
+def calculate_inner_distances(lines: tuple[Line], rectangle: Rectangle) -> tuple[list[Line], float]:
+    """Calculate the inner distances for the intersected lines over rectangle
+
+    Args:
+        lines (tuple[Line]): lines to be calculated its intersected parts
+        rectangle (Rectangle): rectangle that contains intersected parts
+
+    Returns:
+        tuple[list[Line], float]: tuple of new inner lines and their total distance
+    """
+
+    inner_lines = [location(line, rectangle) for line in lines]
+
+    inner_lines = [inner_line for inner_line in inner_lines if inner_line is not None]
+
+    total_inner_distance = sum([inner_line.distance for inner_line in inner_lines])
+    total_inner_distance = round(total_inner_distance, 2)
+    
+    return inner_lines, total_inner_distance
+
