@@ -20,6 +20,14 @@ class Point:
 
     def __gt__(self, other: Self):
         return self.x > other.x or self.y > other.y
+    
+    def to_tuple(self) -> tuple:
+        """Convert point's x, y to tuple
+
+        Returns:
+            tuple: x, y coordinates as tuple
+        """
+        return (self.x, self.y)
 
 
 @dataclass
@@ -37,8 +45,8 @@ class Line:
             self.name = text[:text.find('=')].strip()
 
     def __str__(self) -> str:
-        output = f"Line{(self.point1, self.point2)}"
-        if (self.name is None):
+        output = f"Line{(self.point1.to_tuple(), self.point2.to_tuple())}"
+        if (self.name is not None):
             output = self.name + output
         return output
 
@@ -116,7 +124,6 @@ class Rectangle:
         Returns:
             bool: condition belongs to the checked point
         """
-        # TODO: Change condition if applicable after debugging
         # return  self.lowest_point <= point <= self.highest_point
 
         COND1 = self.lowest_point.x <= point.x <= self.highest_point.x
@@ -133,7 +140,6 @@ class Rectangle:
             bool: condition belongs to the checked point
         """
 
-        # TODO: Change condition if applicable after debugging
         # return point < self.lowest_point or point > self.highest_point
 
         COND1 = point.x < self.lowest_point.x or point.x > self.highest_point.x
