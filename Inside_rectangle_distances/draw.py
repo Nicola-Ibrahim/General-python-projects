@@ -86,6 +86,11 @@ def plot_line(line: Line, ax: plt.Axes = None, color: str = None) -> plt.Axes:
                 line.point2.to_tuple())
 
     ax.add_line(lines.Line2D(x_, y_, linewidth=3, color=color))
+    
+    # Plot both endpoints of each inner line
+    for point in [line.point1, line.point2]:
+        ax = plot_point(point, ax=ax)
+        
     return ax
 
 
