@@ -132,6 +132,7 @@ def location(line: Line, rectangle: Rectangle) -> Line:
         return intersected_line(line, rectangle, checking_point=line.point1, inner_point=line.point2)
 
 
+
     elif(not IS_POINT1_INNER and not IS_POINT2_INNER):
         return intersected_line(line, rectangle)
 
