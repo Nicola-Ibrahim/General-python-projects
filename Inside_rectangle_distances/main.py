@@ -5,16 +5,12 @@ rectangle
 """
 
 from core import Point, Line, Rectangle
-from utils import make_rectangle, location
+
+import utils
+import draw
+import matplotlib.pyplot as plt
 
 
-def calculate_inner_distance(lines: tuple[Line], rectangle: Rectangle):
-
-    inner_lines = [location(line, rectangle) for line in lines]
-
-    inner_lines = [line.distance for line in lines if line is not None]
-    
-    return sum(inner_lines)
 
 if __name__ == "__main__":
 
@@ -28,7 +24,8 @@ if __name__ == "__main__":
 
     lines_points = (
         ((-3, 4), (0, 8)),
-        # ((6, 2), (12, 9)),
+        ((6, 2), (12, 9)),
+        ((-5, 2), (5, 9)),
         ((-4, 2), (2, 4)),
         ((-1, 4), (6, 0)),
         ((3, 7), (10, -1)),
@@ -44,10 +41,29 @@ if __name__ == "__main__":
     lines = tuple(map(lambda point: (Line(*point)), lines_points))
 
 
-    rectangle = make_rectangle(rectangle_points)
 
-    print(calculate_inner_distance(lines, rectangle))
+    rectangle = utils.make_rectangle(rectangle_points)
 
+    inner_lines, total_inner_distance = utils.calculate_inner_distances(lines, rectangle)
+
+
+    # Plot rectangle 
+    ax = draw.plot_rectangle(rectangle)
+
+    # Plot lines
+    for line in lines:
+        ax = draw.plot_line(line, ax=ax, color='black')
     
+    # Plot inner lines
+    for line in inner_lines:
+        ax = draw.plot_line(line, ax=ax, color='green')
+    
+    
+    # Change the title of the figure
+    ax.set_title(label=f"The total_inner_distance is {total_inner_distance}")
+
+    plt.legend()
+    plt.show()
+
 
 
