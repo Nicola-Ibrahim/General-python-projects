@@ -1,5 +1,6 @@
-from core import Point, Line, Rectangle
 import math
+
+from core import Line, Point, Rectangle
 
 
 def make_rectangle(points: list[Point]):
@@ -15,8 +16,9 @@ def make_rectangle(points: list[Point]):
     sorted_points = sorted(points)
 
     # Get the bottom_left point and upper_right point
-    bottom_left_point, upper_right_point = Point(
-        *sorted_points[0]), Point(*sorted_points[-1])
+    bottom_left_point, upper_right_point = Point(*sorted_points[0]), Point(
+        *sorted_points[-1]
+    )
 
     return Rectangle(bottom_left_point, upper_right_point)
 
@@ -31,9 +33,9 @@ def intersection(line1: Line, line2: Line):
     Returns:
         Point: return the intersection point if it exists else return None
     """
-    D = line1.coef['A'] * line2.coef['B'] - line1.coef['B'] * line2.coef['A']
-    Dx = line1.coef['C'] * line2.coef['B'] - line1.coef['B'] * line2.coef['C']
-    Dy = line1.coef['A'] * line2.coef['C'] - line1.coef['C'] * line2.coef['A']
+    D = line1.coef["A"] * line2.coef["B"] - line1.coef["B"] * line2.coef["A"]
+    Dx = line1.coef["C"] * line2.coef["B"] - line1.coef["B"] * line2.coef["C"]
+    Dy = line1.coef["A"] * line2.coef["C"] - line1.coef["C"] * line2.coef["A"]
     if D != 0:
         x = Dx / D
         y = Dy / D
@@ -57,8 +59,12 @@ def calculate_distance(point1: Point, point2: Point) -> float:
 
 
 # TODO: create wrapper method for decoration
-def intersected_line(line: Line, rectangle: Rectangle, 
-    checking_point: Point = None, inner_point: Point = None) -> Line:
+def intersected_line(
+    line: Line,
+    rectangle: Rectangle,
+    checking_point: Point = None,
+    inner_point: Point = None,
+) -> Line:
 
     """Intersect the line with rectangle's lines
 
@@ -79,13 +85,13 @@ def intersected_line(line: Line, rectangle: Rectangle,
 
         inter_point = Point(x, y)
 
-        if (rectangle.is_inner(inter_point)):
+        if rectangle.is_inner(inter_point):
             inter_points.append(inter_point)
 
-    if (not inter_points):
+    if not inter_points:
         return None
 
-    if (isinstance(checking_point, Point)):
+    if isinstance(checking_point, Point):
         # Find the distance between outer point and the
         # both intersected points
         # and select the lower distance
@@ -94,10 +100,10 @@ def intersected_line(line: Line, rectangle: Rectangle,
         dist2 = calculate_distance(checking_point, inter_points[1])
 
         line = Line(*inter_points)
-        if (dist1 > dist2):
+        if dist1 > dist2:
             inter_points = (inner_point, inter_points[1])
 
-        elif (dist1 < dist2):
+        elif dist1 < dist2:
             inter_points = (inner_point, inter_points[0])
 
     return Line(*inter_points)
@@ -118,26 +124,30 @@ def location(line: Line, rectangle: Rectangle) -> Line:
     IS_POINT2_INNER = rectangle.is_inner(line.point2)
 
     # Both line's points are inside the rectangle
-    if (IS_POINT1_INNER and IS_POINT2_INNER):
+    if IS_POINT1_INNER and IS_POINT2_INNER:
         return line
 
     # One of the points is outside
-    elif (IS_POINT1_INNER and not IS_POINT2_INNER):
+    elif IS_POINT1_INNER and not IS_POINT2_INNER:
 
         # pass outer line outer point for calculate the distance
-        return intersected_line(line, rectangle, checking_point=line.point2, inner_point=line.point1)
+        return intersected_line(
+            line, rectangle, checking_point=line.point2, inner_point=line.point1
+        )
 
-    elif (not IS_POINT1_INNER and IS_POINT2_INNER):
+    elif not IS_POINT1_INNER and IS_POINT2_INNER:
         # pass outer line outer point for calculate the distance
-        return intersected_line(line, rectangle, checking_point=line.point1, inner_point=line.point2)
+        return intersected_line(
+            line, rectangle, checking_point=line.point1, inner_point=line.point2
+        )
 
-
-
-    elif(not IS_POINT1_INNER and not IS_POINT2_INNER):
+    elif not IS_POINT1_INNER and not IS_POINT2_INNER:
         return intersected_line(line, rectangle)
 
 
-def calculate_inner_distances(lines: tuple[Line], rectangle: Rectangle) -> tuple[list[Line], float]:
+def calculate_inner_distances(
+    lines: tuple[Line], rectangle: Rectangle
+) -> tuple[list[Line], float]:
     """Calculate the inner distances for the intersected lines over rectangle
 
     Args:
@@ -154,6 +164,5 @@ def calculate_inner_distances(lines: tuple[Line], rectangle: Rectangle) -> tuple
 
     total_inner_distance = sum([inner_line.distance for inner_line in inner_lines])
     total_inner_distance = round(total_inner_distance, 2)
-    
-    return inner_lines, total_inner_distance
 
+    return inner_lines, total_inner_distance

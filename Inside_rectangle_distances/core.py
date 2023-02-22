@@ -1,8 +1,9 @@
 # Import libraries
-from dataclasses import dataclass, field
-import traceback
-from typing import Self
 import math
+import traceback
+from dataclasses import dataclass, field
+from typing import Self
+
 
 @dataclass
 class Point:
@@ -21,7 +22,6 @@ class Point:
     def __gt__(self, other: Self):
         return self.x > other.x or self.y > other.y
 
-    
     def to_tuple(self) -> tuple:
         """Convert point's x, y to tuple
 
@@ -33,22 +33,21 @@ class Point:
 
 @dataclass
 class Line:
-    """Line class consists of two endpoints
-    """
+    """Line class consists of two endpoints"""
+
     point1: Point
     point2: Point
     name: str = field(default=None)
 
     def __post_init__(self):
         if self.name is None:
-            filename, line_number, function_name, text = traceback.extract_stack(
-            )[-3]
-            self.name = text[:text.find('=')].strip()
+            filename, line_number, function_name, text = traceback.extract_stack()[-3]
+            self.name = text[: text.find("=")].strip()
 
     def __str__(self) -> str:
 
         output = f"Line{(self.point1.to_tuple(), self.point2.to_tuple())}"
-        if (self.name is not None):
+        if self.name is not None:
             output = self.name + output
         return output
 
@@ -59,8 +58,7 @@ class Line:
         Returns:
             slop_value: the slop of the line
         """
-        slop_value = (self.point1.y - self.point2.y) / \
-            (self.point1.x - self.point2.x)
+        slop_value = (self.point1.y - self.point2.y) / (self.point1.x - self.point2.x)
         return slop_value
 
     # The standard line equation is (Ax + By = C)
@@ -71,20 +69,19 @@ class Line:
         Returns:
             dict: line's coefficients
         """
-        A = (self.point1.y - self.point2.y)
-        B = (self.point2.x - self.point1.x)
-        C = (self.point1.x*self.point2.y - self.point2.x*self.point1.y)
+        A = self.point1.y - self.point2.y
+        B = self.point2.x - self.point1.x
+        C = self.point1.x * self.point2.y - self.point2.x * self.point1.y
 
         coef_values = dict()
-        coef_values['A'] = A
-        coef_values['B'] = B
-        coef_values['C'] = -C
+        coef_values["A"] = A
+        coef_values["B"] = B
+        coef_values["C"] = -C
         return coef_values
-
 
     @property
     def distance(self) -> float:
-        
+
         """Calculate the Euclidean distance between two points
 
         Returns:
@@ -93,12 +90,14 @@ class Line:
         dist = math.dist((self.point1.x, self.point1.y), (self.point2.x, self.point2.y))
         return dist
 
+
 @dataclass
 class Rectangle:
     """
     Class is responsible to identify a new rectangle with its
     data
     """
+
     lowest_point: Point
     highest_point: Point
     width: float = field(init=False)
@@ -108,14 +107,22 @@ class Rectangle:
         self.width = self.highest_point.x - self.lowest_point.x
         self.hight = self.highest_point.y - self.lowest_point.y
 
-        self._rec_left_line = Line(self.lowest_point, Point(
-            self.lowest_point.x, self.lowest_point.y + self.hight))
-        self._rec_bottom_line = Line(self.lowest_point, Point(
-            self.lowest_point.x + self.width, self.lowest_point.y))
-        self._rec_right_line = Line(self.highest_point, Point(
-            self.highest_point.x, self.highest_point.y - self.hight))
-        self._rec_top_line = Line(self.highest_point, Point(
-            self.highest_point.x - self.width, self.highest_point.y))
+        self._rec_left_line = Line(
+            self.lowest_point,
+            Point(self.lowest_point.x, self.lowest_point.y + self.hight),
+        )
+        self._rec_bottom_line = Line(
+            self.lowest_point,
+            Point(self.lowest_point.x + self.width, self.lowest_point.y),
+        )
+        self._rec_right_line = Line(
+            self.highest_point,
+            Point(self.highest_point.x, self.highest_point.y - self.hight),
+        )
+        self._rec_top_line = Line(
+            self.highest_point,
+            Point(self.highest_point.x - self.width, self.highest_point.y),
+        )
 
     def is_inner(self, point: Point):
         """Check if the point is inner or in the boundary of the rectangle
@@ -157,4 +164,9 @@ class Rectangle:
             tuple: rectangle's lines
         """
 
-        return (self._rec_left_line, self._rec_bottom_line, self._rec_right_line, self._rec_top_line)
+        return (
+            self._rec_left_line,
+            self._rec_bottom_line,
+            self._rec_right_line,
+            self._rec_top_line,
+        )
