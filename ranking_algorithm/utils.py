@@ -1,10 +1,13 @@
-import collections
 import math
 from itertools import chain, combinations
 
 
-def get_combinations(spaces: list):
-    return chain.from_iterable(combinations(spaces, r) for r in range(len(spaces) + 1))
+def get_space_combinations(spaces: list):
+    combs = list(
+        chain.from_iterable(combinations(spaces, r) for r in range(len(spaces) + 1))
+    )
+    # Remove the first empty element [(),]
+    return combs[1:]
 
 
 def cal_std(combs_time_span: list[int], target: int) -> float:
@@ -61,10 +64,32 @@ def count_ones_sets(combination: list | tuple) -> int:
     return count
 
 
-def cal_ranks(
+def get_score(z_score: float, num_cancellable_spaces: int, num_spaces: int) -> float:
+    """Get the score for a specific spaces combination
+
+    Args:
+        z_score (float): combination z_score value
+        num_cancellable_spaces (int): combination num of cancellable spaces
+        num_spaces (int): combination num of spaces
+
+    Returns:
+        float: score value
+    """
+    if z_score > 0:
+        score = 1 / (
+            (0.6 * num_cancellable_spaces) + (0.3 * num_spaces) + (0.1 * z_score)
+        )
+
+    else:
+        score = (0.1 * z_score) / ((0.6 * num_cancellable_spaces) + (0.3 * num_spaces))
+
+    return round(score, 3)
+
+
+def cal_scores(
     z_scores: list[float], cancellable_spaces: list[int], spaces: list[int]
 ) -> list[float]:
-    """Calculate the ranks list for the spaces combinations
+    """Calculate the scores list for the spaces combinations
 
     Args:
         z_scores (list[float]): list of z_scores for the spaces' combination
@@ -75,32 +100,34 @@ def cal_ranks(
         list[float]: _description_
     """
 
-    ranks = []
+    scores = []
 
     for z_score, num_cancellable_spaces, num_spaces in zip(
         z_scores, cancellable_spaces, spaces
     ):
-        rank = (0.1 * z_score) / (0.6 * num_cancellable_spaces + 0.3 * num_spaces)
-        rank = round(rank, 3)
-        ranks.append(rank)
 
-    return ranks
+        scores.append(get_score(z_score, num_cancellable_spaces, num_spaces))
+
+    return scores
 
 
-z_scores = (-0.86, -0.43, -1.147, +1.01, -0.158, +0.339, +1.653)
-cancellable_spaces = (1, 0, 1, 0, 1, 1, 1)
-spaces = (1, 1, 1, 2, 2, 2, 3)
+# def encode()
 
-spaces_name = [
-    "A1",
-    "A2",
-    "A3",
-    ("A1", "A2"),
-    ("A1", "A3"),
-    ("A2", "A3"),
-    ("A1", "A2", "A3"),
-]
 
-spaces_score = dict(zip(spaces_name, cal_ranks(z_scores, cancellable_spaces, spaces)))
+# z_scores = (-0.86, -0.43, -1.147, +1.01, -0.158, +0.339, +1.653)
+# cancellable_spaces = (1, 0, 1, 1, 2, 1, 2)
+# spaces = (1, 1, 1, 2, 2, 2, 3)
 
-print(sorted(spaces_score.items(), key=lambda x: x[1], reverse=True))
+# spaces_name = [
+#     "A1",
+#     "A2",
+#     "A3",
+#     ("A1", "A2"),
+#     ("A1", "A3"),
+#     ("A2", "A3"),
+#     ("A1", "A2", "A3"),
+# ]
+
+# spaces_score = dict(zip(spaces_name, cal_scores(z_scores, cancellable_spaces, spaces)))
+
+# print(sorted(spaces_score.items(), key=lambda x: x[1], reverse=True))
