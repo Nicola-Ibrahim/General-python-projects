@@ -11,18 +11,19 @@ class DateTimeEncoder(JSONEncoder):
             return obj.isoformat()
 
 
-def decode_date_time(date_dict):
+def decode_date_time(space_dict) -> dict:
+    """Decode string date to be datetime object
 
-    # def format(value):
-    #     # return datetime.datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f")
-    #     return dateutil.parser.parse(value)
+    Args:
+        space_dict (_type_): space's date dict
 
-    if "start" in date_dict:
-        date_dict["start"] = dateutil.parser.parse(date_dict["start"])
+    Returns:
+        dict: a new formatted space dict
+    """
+    if "start" in space_dict:
+        space_dict["start"] = dateutil.parser.parse(space_dict["start"])
 
-    if "end" in date_dict:
-        date_dict["end"] = dateutil.parser.parse(date_dict["end"])
+    if "end" in space_dict:
+        space_dict["end"] = dateutil.parser.parse(space_dict["end"])
 
-    # date_dict_copy = {k: format(v) for k, v in date_dict_copy.items()}
-
-    return date_dict
+    return space_dict
