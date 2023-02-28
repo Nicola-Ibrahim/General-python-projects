@@ -1,9 +1,5 @@
-from pathlib import Path
-
-from core import run
+from core import app
 
 if __name__ == "__main__":
-    # Build paths inside the project like this: BASE_DIR / 'subdir'.
-    BASE_DIR = Path(__file__).resolve().parent
 
-    run(BASE_DIR)
+    app.run()
