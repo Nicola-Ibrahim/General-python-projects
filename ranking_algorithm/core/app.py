@@ -1,24 +1,15 @@
-from . import utils
+from . import core, topsis, utils
 
 
 def run():
-    encoded_time_range = utils.get_encoded_spaces_time_range(
-        file_path="fixtures/reservations_dummy_data.json"
+    encoded_time_range = utils.get_encoded_spaces_time_range()
+    space_combinations = utils.get_encoded_spaces_combinations(encoded_time_range)
+    decision_matrix = core.create_decision_matrix(space_combinations)
+    weights = core.entropy_weights_method(
+        goal_time=102, decision_matrix=decision_matrix
     )
-    print(encoded_time_range)
-    # combinations = utils.get_space_combinations(encoded_time.keys())
-    # print(combinations)
+    # weights = [0.2, 0.1, 0.7]
+    print(weights)
+    t = topsis.Topsis(decision_matrix, weights, criteria=[False, False, False])
 
-    # spaces_name = [
-    #     "A1",
-    #     "A2",
-    #     "A3",
-    #     ("A1", "A2"),
-    #     ("A1", "A3"),
-    #     ("A2", "A3"),
-    #     ("A1", "A2", "A3"),
-    # ]
-
-    # spaces_score = dict(zip(spaces_name, cal_scores(z_scores, cancellable_spaces, spaces)))
-
-    # print(sorted(spaces_score.items(), key=lambda x: x[1], reverse=True))
+    print(t.get_rank())
