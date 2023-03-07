@@ -1,11 +1,16 @@
 import math
 
+import matplotlib.pyplot as pltd
+import numpy as np
 import pandas as pd
+import pandas as p
+import seaborn as sns
+from scipy.spatial.distance import squareform
 
 from . import settings
 
 
-def create_decision_matrix(data: pd.DataFrame = None) -> pd.DataFrame:
+def create_decision_matrix(goal_time: int, data: pd.DataFrame = None) -> pd.DataFrame:
     """Create decision matrix for ranking algorithm
 
     Args:
@@ -22,10 +27,13 @@ def create_decision_matrix(data: pd.DataFrame = None) -> pd.DataFrame:
     )
 
     matrix = pd.DataFrame(
-        columns=["total_time_range", "num_spaces", "num_cancellable_spaces"],
+        columns=[
+            "num_cancellable_spaces",
+            "num_spaces",
+            "total_time_range",
+        ],
         index=processed_combinations_data.columns,
     )
-
     # Loop to take only value of specific attribute
     for comb, details in processed_combinations_data.items():
         for det, value in details.items():
@@ -33,6 +41,12 @@ def create_decision_matrix(data: pd.DataFrame = None) -> pd.DataFrame:
                 matrix[det][comb] = value
 
     decision_matrix = pd.DataFrame(matrix)
+
+    # Substitute total_time_range by distance column
+    decision_matrix["distance"] = (
+        decision_matrix["total_time_range"] - goal_time
+    ).abs()
+    decision_matrix.drop(columns=["total_time_range"], inplace=True)
 
     # decision_matrix.to_pickle(settings.DECISION_MATRIX_PATH)
     return decision_matrix
@@ -55,10 +69,6 @@ def entropy_weights_method(
         if decision_matrix is None
         else decision_matrix
     )
-
-    # Substitute total_time_range by distance column
-    dmatrix["distance"] = (dmatrix["total_time_range"] - goal_time).abs()
-    dmatrix.drop(columns=["total_time_range"], inplace=True)
 
     # Start the algorithm
     rows, cols = dmatrix.shape
@@ -89,3 +99,91 @@ def entropy_weights_method(
     weights.index = dmatrix.columns
     weights.columns = ["weight"]
     return weights
+
+
+def make_eval_matrix(arr: list) -> np.ndarray:
+    """Transform the input to appropriate format
+
+    Args:
+        arr (list): the array with the weight with respect to the right order (w = w1, w2, w3, w4...)
+
+    Returns:
+        np.ndarray: Transformed the w array to get the right format of the A matrix
+    """
+
+    X = (squareform(arr)).astype(float)
+    row, col = np.diag_indices(X.shape[0])
+    X[row, col] = np.ones(X.shape[0])
+    for i in range(0, len(row)):
+        for j in range(0, len(col)):
+            if j < i:
+                X[i, j] = 1 / X[i, j]
+    A = np.asarray(X)
+    return A
+
+
+def AHP_weights_method(sub_weights: list) -> list:
+    eval_matrix = make_eval_matrix(sub_weights)
+    eval_matrix_len = len(eval_matrix)
+    sums = np.array(pd.DataFrame(eval_matrix).sum())
+
+    ln_rgmm = np.log(eval_matrix)
+    rgmm_sum = np.exp(ln_rgmm.sum(axis=1) / eval_matrix_len)
+    rggm = rgmm_sum / rgmm_sum.sum()
+
+    errors = np.zeros(eval_matrix.shape)
+    size = errors.shape[1]
+    # for i in range(0, size):
+    #     for j in range(0, size):
+    #         errors[i, j] = np.log(eval_matrix[i, j] * rggm[j] / rggm[i]) ** 2
+
+    # print(errors)
+
+    # errors_sum = errors.sum(axis=0)
+    # error_calc = np.sqrt(errors_sum / (size - 1))
+    # rggm_cosh = rggm * np.cosh(error_calc)
+    # rggm_cosh_sum = np.sum(rggm_cosh)
+    # rggm_final = rggm_cosh / rggm_cosh_sum
+    # rggm_matmul = np.matmul(sums, rggm)
+
+    # plus_minus = rggm * np.sinh(error_calc) / rggm_cosh_sum
+    # cr0 = (rggm_matmul - eval_matrix_len) / (
+    #     (2.7699 * eval_matrix_len - 4.3513) - eval_matrix_len
+    # )
+    eig_val = np.linalg.eig(eval_matrix)[0].max()
+    eig_vec = np.linalg.eig(eval_matrix)[1][:, 0]
+    priorities = np.round(np.real(eig_vec / eig_vec.sum()), 3)  # weights
+    print(f"{priorities = }")
+    cr = np.round(
+        np.real(
+            (eig_val - eval_matrix_len)
+            / ((2.7699 * eval_matrix_len - 4.3513) - eval_matrix_len)
+        ),
+        3,
+    )
+    evt = np.real(eval_matrix * size / eig_val)
+
+    # for i in range(0, size):
+    #     for j in range(0, size):
+    #         evt[i, j] = evt[i, j] * rggm_final[j]
+
+    # pi_pi = np.zeros(eval_matrix.shape)
+    # for i in range(0, size):
+    #     for j in range(0, size):
+    #         pi_pi[i, j] = rggm[j] / rggm[i]
+
+    # pi_pi_A = pi_pi * eval_matrix
+    # pi_pi_A2 = np.zeros(eval_matrix.shape)
+    # for i in range(0, size):
+    #     for j in range(0, size):
+    #         if pi_pi_A[i, j] > 1 / 9 and pi_pi_A[i, j] < 9:
+    #             if pi_pi_A[i, j] > 1:
+    #                 pi_pi_A2[i, j] = eval_matrix[i, j] * pi_pi[i, j]
+    #             else:
+    #                 pi_pi_A2[i, j] = 1 / (eval_matrix[i, j] * pi_pi[i, j])
+    #         else:
+    #             pi_pi_A2[i, j] = 0
+    # Consistency_ratio = list(pi_pi_A2[np.triu_indices(eval_matrix_len, k=1)])
+    # std = np.array(pd.DataFrame(evt).std(1))
+
+    return p, cr, rggm, evt
