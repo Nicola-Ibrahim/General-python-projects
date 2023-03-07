@@ -45,11 +45,8 @@ def save_to_json(file_path):
             encoded_time_range = func(*args, **kwargs)
 
             # Save to json file
-            if settings.SAVE_FILES_FLAG:
-                with open(file_path, mode="w") as f:
-                    json.dump(
-                        encoded_time_range, f, indent=4, cls=parsing.DateTimeEncoder
-                    )
+            with open(file_path, mode="w") as f:
+                json.dump(encoded_time_range, f, indent=4, cls=parsing.DateTimeEncoder)
 
             return encoded_time_range
 
@@ -104,7 +101,7 @@ def encode_spaces_time_range(spaces_data: dict) -> dict:
     return encoded_time_range
 
 
-# @save_to_json(settings.PRE_PROC_SPACES_TIME_PATH)
+@save_to_json(settings.PRE_PROC_SPACES_TIME_PATH)
 def get_encoded_spaces_time_range() -> dict:
 
     # Read spaces data file
@@ -225,6 +222,7 @@ def squash_spaces_combination_details(encoded_spaces_data: dict) -> dict:
     Returns:
         dict: encoded time for each combination
     """
+    # TODO: sorting the the spaces by "hours" before create combinations
 
     combinations = create_space_combinations(encoded_spaces_data.keys())
     max_combination_size = len(combinations[-1])
@@ -272,7 +270,7 @@ def squash_spaces_combination_details(encoded_spaces_data: dict) -> dict:
     return encoded_time_range
 
 
-# @save_to_json(settings.PROC_SPACES_DATA_PATH)
+@save_to_json(settings.PROC_SPACES_DATA_PATH)
 def get_encoded_spaces_combinations(data: dict) -> dict:
     """Get the encoded combination of spaces
 
@@ -290,4 +288,3 @@ def get_encoded_spaces_combinations(data: dict) -> dict:
     )
 
     return encoded_time_range
-
