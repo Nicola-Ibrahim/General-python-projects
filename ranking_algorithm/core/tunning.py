@@ -10,46 +10,7 @@ from scipy.spatial.distance import squareform
 from . import settings
 
 
-def create_decision_matrix(goal_time: int, data: pd.DataFrame = None) -> pd.DataFrame:
-    """Create decision matrix for ranking algorithm
 
-    Args:
-        data (pd.DataFrame, optional): spaces data. Defaults to None.
-
-    Returns:
-        pd.DataFrame: the created decision matrix
-    """
-    # Read spaces data file
-    processed_combinations_data = (
-        pd.read_json(settings.PROC_SPACES_DATA_PATH)
-        if data is None
-        else pd.DataFrame(data)
-    )
-
-    matrix = pd.DataFrame(
-        columns=[
-            "num_cancellable_spaces",
-            "num_spaces",
-            "total_time_range",
-        ],
-        index=processed_combinations_data.columns,
-    )
-    # Loop to take only value of specific attribute
-    for comb, details in processed_combinations_data.items():
-        for det, value in details.items():
-            if det in ["total_time_range", "num_spaces", "num_cancellable_spaces"]:
-                matrix[det][comb] = value
-
-    decision_matrix = pd.DataFrame(matrix)
-
-    # Substitute total_time_range by distance column
-    decision_matrix["distance"] = (
-        decision_matrix["total_time_range"] - goal_time
-    ).abs()
-    decision_matrix.drop(columns=["total_time_range"], inplace=True)
-
-    # decision_matrix.to_pickle(settings.DECISION_MATRIX_PATH)
-    return decision_matrix
 
 
 def entropy_weights_method(
