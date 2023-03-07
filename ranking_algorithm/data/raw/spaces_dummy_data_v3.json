@@ -1,0 +1,41 @@
+{
+  "A1": {
+    "available_dates": [
+      {
+        "start": "2022-01-01T08:00:00",
+        "end": "2022-01-01T16:00:00"
+      }
+    ],
+    "cancellable": true
+  },
+
+  "A2": {
+    "available_dates": [
+      {
+        "start": "2022-01-01T08:00:00",
+        "end": "2022-01-01T16:00:00"
+      }
+    ],
+    "cancellable": false
+  },
+
+  "A3": {
+    "available_dates": [
+      {
+        "start": "2022-01-01T14:00:00",
+        "end": "2022-01-01T16:00:00"
+      }
+    ],
+    "cancellable": true
+  },
+
+  "A4": {
+    "available_dates": [
+      {
+        "start": "2022-01-01T08:00:00",
+        "end": "2022-01-01T15:00:00"
+      }
+    ],
+    "cancellable": true
+  }
+}
